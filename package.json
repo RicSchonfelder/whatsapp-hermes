@@ -1,0 +1,34 @@
+{
+  "name": "whatsapp-hermes",
+  "version": "1.0.0",
+  "description": "MCP server that lets an AI agent (Hermes) send and receive WhatsApp messages via Baileys (WhatsApp Web protocol).",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "whatsapp-hermes": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "pair": "node src/index.js --pair-only"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "whatsapp",
+    "baileys",
+    "hermes",
+    "ai-agent"
+  ],
+  "author": "RicSchonfelder",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@whiskeysockets/baileys": "^7.0.0-rc.13",
+    "pino": "^9.5.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

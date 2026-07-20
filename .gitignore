@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# WhatsApp auth/session — NEVER commit (grants full account access)
+wa_auth/
+*.session
+
+# Logs
+*.log
+logs/
+
+# Env
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
