@@ -17,6 +17,9 @@ qr_pair.png
 qr_capture.mjs
 qr_capture.log
 
+# Runtime message cache (voice notes + transcripts) — local only, never commit
+wa_cache/
+
 # OS
 .DS_Store
 Thumbs.db

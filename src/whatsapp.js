@@ -16,17 +16,23 @@ import {
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
+  downloadMediaMessage,
 } from "@whiskeysockets/baileys";
 import { Boom } from "@hapi/boom";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { writeFile, mkdir } from "fs/promises";
+import { existsSync, mkdirSync } from "fs";
 import qrcode from "qrcode-terminal";
 import pino from "pino";
+import { spawn } from "child_process";
 
 import { logger } from "./logger.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const AUTH_DIR = join(__dirname, "..", "wa_auth");
+const CACHE_DIR = join(__dirname, "..", "wa_cache");
+const INBOX_DIR = join(CACHE_DIR, "inbox");
 const BUFFER_SIZE = parseInt(process.env.WHATSAPP_BUFFER_SIZE || "200", 10);
 
 // Parse the allow-list once.
@@ -168,6 +174,16 @@ export class WhatsAppClient {
         );
       }
 
+      // Download voice notes / PTT so they can be transcribed later.
+      const msgType = Object.keys(msg.message || {}).find((k) =>
+        ["audioMessage", "ptvMessage", "ephemeralAudioMessage"].includes(k)
+      );
+      if (msgType) {
+        this._downloadVoice(msg, msgType, senderNum).catch((e) =>
+          logger.error(`voice download error: ${e.message}`)
+        );
+      }
+
       const text = extractText(msg.message);
       const fromName = msg.pushName || senderNum;
       const timestamp =
@@ -197,6 +213,26 @@ export class WhatsAppClient {
       });
     } catch (e) {
       logger.error(`ingest error: ${e.message}`);
+    }
+  }
+
+  async _downloadVoice(msg, msgType, senderNum) {
+    try {
+      if (!existsSync(INBOX_DIR)) mkdirSync(INBOX_DIR, { recursive: true });
+      const buffer = await downloadMediaMessage(msg, "buffer", {});
+      const id = msg.key.id || `v${Date.now()}`;
+      const file = join(INBOX_DIR, `${senderNum}_${id}.ogg`);
+      await writeFile(file, buffer);
+      logger.info(`Voice saved: ${file}`);
+      // Transcribe asynchronously (does not block ingest).
+      const script = join(__dirname, "transcribe_inbox.py");
+      if (existsSync(script)) {
+        const py = process.env.WHATSAPP_TRANSCRIBE_PY || "python3";
+        const p = spawn(py, [script, file], { stdio: "ignore" });
+        p.on("error", (e) => logger.error(`transcribe spawn error: ${e.message}`));
+      }
+    } catch (e) {
+      logger.error(`_downloadVoice error: ${e.message}`);
     }
   }
 
