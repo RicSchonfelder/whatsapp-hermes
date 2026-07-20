@@ -12,6 +12,11 @@ logs/
 # Env
 .env
 
+# Manual pairing helper artifacts (generated, not part of the project)
+qr_pair.png
+qr_capture.mjs
+qr_capture.log
+
 # OS
 .DS_Store
 Thumbs.db

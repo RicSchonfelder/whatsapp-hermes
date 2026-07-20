@@ -99,6 +99,34 @@ extend this project, keep that invariant.
 - Always set `WHATSAPP_ALLOWED_NUMBERS` before exposing the agent.
 - Prefer a dedicated phone number for the bot.
 
+## Manutencao
+
+### Secrets que nunca devem ser commitados
+
+- `wa_auth/` — contem a sessao autenticada do WhatsApp (credenciais completas).
+  Quem tiver acesso a ela pode ler e enviar mensagens como se fosse o numero
+  vinculado.
+- `.env` — contem configuracao sensivel (numbers permitidos, etc.).
+
+Ambos estao no `.gitignore` e protegidos pelo `scripts/cleanup.sh`.
+
+### Limpeza de artefatos temporarios
+
+O projeto gera arquivos operacionais que podem ser removidos sem risco:
+
+```bash
+bash scripts/cleanup.sh
+```
+
+O script remove apenas `*.log` e `qr_pair.png` na raiz do projeto. Ele **nunca**
+toca em `wa_auth/` ou `.env`.
+
+### Arquivos de log
+
+Arquivos como `pair_stdout.log`, `pair_stderr.log`, `test_send.log` e
+`qr_capture.log` sao criados durante pareamento e testes. Podem ser apagados a
+qualquer momento com o script acima ou manualmente.
+
 ## License
 
 MIT © RicSchonfelder
