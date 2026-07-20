@@ -69,7 +69,14 @@ session is saved to `wa_auth/` and reused on every subsequent run.
 ## Register with Hermes
 
 ```bash
-hermes mcp add whatsapp --command "node D:/Programas/Whatsapp/src/index.js"
+hermes mcp add whatsapp --command "node" --args "D:/Programas/Whatsapp/src/index.js"
+```
+
+On Windows, if `node` isn't resolved from PATH, use the absolute path to the
+Node executable:
+
+```bash
+hermes mcp add whatsapp --command "C:\\Program Files\\nodejs\\node.exe" --args "D:/Programas/Whatsapp/src/index.js"
 ```
 
 Then in Hermes, reload MCP servers (`/reload-mcp`) or start a new session. The
