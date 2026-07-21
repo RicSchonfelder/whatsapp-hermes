@@ -25,6 +25,7 @@ is required.
 |------|---------|--------|
 | `whatsapp_status` | Connection + pairing state | — |
 | `whatsapp_send` | Send a text message | `to` (number or JID), `message` |
+| `whatsapp_send_image` | Send an image from a local path | `to`, `imagePath` (absolute), `caption?` |
 | `whatsapp_list_chats` | Recent chats, newest first | — |
 | `whatsapp_get_messages` | Buffered incoming messages | `chatId?`, `limit?` (20), `since?` (epoch ms) |
 

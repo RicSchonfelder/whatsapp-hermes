@@ -37,6 +37,30 @@ const TOOLS = [
     },
   },
   {
+    name: "whatsapp_send_image",
+    description:
+      "Send an image from a local absolute file path. The file must exist and be a valid image (jpg, png, gif, webp, etc.).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        to: {
+          type: "string",
+          description: "Phone number (digits only, with country code) or a full JID.",
+        },
+        imagePath: {
+          type: "string",
+          description: "Absolute path to the image file on disk.",
+        },
+        caption: {
+          type: "string",
+          description: "Optional caption text to accompany the image.",
+        },
+      },
+      required: ["to", "imagePath"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "whatsapp_list_chats",
     description:
       "List recent chats seen since the server started, newest first, with the last message preview.",
@@ -99,6 +123,13 @@ export async function startMcpServer(wa) {
           if (!args.to || !args.message)
             return err("Both 'to' and 'message' are required.");
           const res = await wa.send(args.to, args.message);
+          return ok(res);
+        }
+
+        case "whatsapp_send_image": {
+          if (!args.to || !args.imagePath)
+            return err("Both 'to' and 'imagePath' are required.");
+          const res = await wa.sendImage(args.to, args.imagePath, args.caption);
           return ok(res);
         }
 

@@ -21,7 +21,7 @@ import {
 import { Boom } from "@hapi/boom";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { writeFile, mkdir } from "fs/promises";
+import { readFile, writeFile, mkdir } from "fs/promises";
 import { existsSync, mkdirSync } from "fs";
 import qrcode from "qrcode-terminal";
 import pino from "pino";
@@ -252,6 +252,29 @@ export class WhatsAppClient {
     const jid = toJid(to);
     const result = await this.sock.sendMessage(jid, { text: message });
     logger.info(`Sent to ${jid}: ${message.slice(0, 80)}`);
+    return { success: true, to: jid, id: result?.key?.id || null };
+  }
+
+  async sendImage(to, imagePath, caption) {
+    if (!this.sock || !this.connected) {
+      throw new Error("WhatsApp not connected");
+    }
+    let stat;
+    try {
+      stat = await import("fs").then((fs) => fs.promises.stat(imagePath));
+    } catch {
+      throw new Error(`Image file not found or unreadable: ${imagePath}`);
+    }
+    if (!stat.isFile()) {
+      throw new Error(`Path is not a file: ${imagePath}`);
+    }
+    const buffer = await readFile(imagePath);
+    const jid = toJid(to);
+    const result = await this.sock.sendMessage(jid, {
+      image: buffer,
+      caption: caption || "",
+    });
+    logger.info(`Image sent to ${jid}: ${imagePath}`);
     return { success: true, to: jid, id: result?.key?.id || null };
   }
 
